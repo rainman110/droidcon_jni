@@ -1,0 +1,43 @@
+buildscript {
+    repositories {
+            mavenCentral()
+    }
+    dependencies {
+            classpath 'com.android.tools.build:gradle:0.9.+'
+    }
+}
+
+apply plugin: 'android'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.3"
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDir      'src'
+            res.srcDir       'res'
+            assets.srcDir    'assets'
+            resources.srcDir 'src'
+            aidl.srcDir '     src'
+            
+            // add compiled libs to apk!
+            jniLibs.srcDir 'libs'
+        }
+    }
+          
+    // the defines how to trigger ndk-build to create droidcon-native.so
+    task ndkBuild(type: Exec) {
+        if (System.properties['os.name'].toLowerCase().contains('windows')) {
+            commandLine 'ndk-build.cmd'
+        } else {
+            commandLine 'ndk-build'
+        }
+    }
+
+    tasks.withType(Compile) {
+        compileTask -> compileTask.dependsOn ndkBuild
+    }
+}
+
